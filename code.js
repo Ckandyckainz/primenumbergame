@@ -20,7 +20,14 @@ function RGBtoString(r, g, b, a){
 function HSVtoString(h, s, v, a){
     let rgb = [0, 0, 0];
     for (let i=0; i<3; i++) {
-        rgb[i] = s*Math.cos(h-i*2*Math.PI/3)-0.5+2*v;
+        rgb[i] = s*Math.cos(h-i*2*Math.PI/3)+0.5;
+        if (rgb[i] > 1) {
+            rgb[i] = 1;
+        }
+        if (rgb[i] < 0) {
+            rgb[i] = 0;
+        }
+        rgb[i] = rgb[i]-1+2*v;
         if (rgb[i] > 1) {
             rgb[i] = 1;
         }
@@ -31,5 +38,43 @@ function HSVtoString(h, s, v, a){
     return RGBtoString(...rgb, a);
 }
 
-mctx.fillStyle = HSVtoString(Math.random()*Math.PI*2, Math.random(), Math.random(), 1);
-mctx.fillRect(0, 0, mcw, mch);
+function factor(n){
+    if (n > 10000) {
+        console.log("ERROR: prime factorization number too big");
+    } else {
+        if (primes[primes.length-1][0] < n-1) {
+            for (let i=primes[primes.length-1][0]+1; i<n; i++) {
+                if (factor(i).length == 1){
+                    primes.push([i, [Math.random()*Math.PI*2, Math.random()*0.3+0.6, Math.random()*0.3+0.6]]);
+                }
+            }
+        }
+        let counter = 0;
+        let m = n;
+        let factors = [];
+        let done = false;
+        while (!done) {
+            if (m == 1) {
+                done = true;
+            }
+            if (primes[counter][0] > Math.sqrt(m)) {
+                factors.push(m);
+                done = true;
+            }
+            if (m%primes[counter][0] == 0) {
+                m /= primes[counter][0];
+                factors.push(primes[counter][0]);
+            } else {
+                counter ++;
+            }
+        }
+        return factors;
+    }
+}
+
+let primes = [[2, [Math.random()*Math.PI*2, Math.random()*0.3+0.6, Math.random()*0.3+0.6]]];
+
+for (let i=0; i<200; i++) {
+    mctx.fillStyle = HSVtoString(Math.PI*2*i/200, Math.random()*0.3+0.6, Math.random()*0.3+0.6, 1);
+    mctx.fillRect(mcw*i/200, 0, mcw*(i+1)/200, mch);
+}
